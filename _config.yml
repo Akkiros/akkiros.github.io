@@ -10,8 +10,8 @@ title: Akkiros Blog
 email: kwj96966@gmail.com
 github_username:  akkiros
 facebook_username: akkiros
-markdown: redcarpet
-redcarpet:
+markdown: kramdown
+kramdown:
   extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "strikethrough", "superscript", "with_toc_data", "tables"]
 
   highlighter: pygments
