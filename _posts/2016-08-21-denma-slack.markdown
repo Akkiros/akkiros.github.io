@@ -139,7 +139,7 @@ rvm cron setup
 
 모든 준비가 다 되었으니 이젠 덴경대를 호출하는 일만 남았다.
 
-슬랙으로 메세지를 보내는 방법은 여러가지가 있지만 필자는 Incomming Webhook을 사용하였다. [참고](https://api.slack.com/incoming-webhooks)
+슬랙으로 메세지를 보내는 방법은 여러가지가 있지만 필자는 [Incomming Webhook](https://api.slack.com/incoming-webhooks)을 사용하였다.
 
 ```ruby
 def send_to_slack(url)
