@@ -3,8 +3,6 @@ layout: post
 title: MariaDB Failover 적용
 ---
 
-# MariaDB Failover 적용
-
 실제 웹서비스를 운영하면서 가장 무서운 일중에 하나가 DB서버가 죽는일이 발생하는 것입니다.  
 READ용 Slave DB가 죽는다면 그나마 피해가 덜 하지만, WRITE용  Master DB가 죽는다면 실제로 서비스에 큰 문제가 발생하게 됩니다.  
 이런 상황을 최대한 문제없이 넘기기 위해서 MariaDB에 Failover를 설정해본 내용을 공유합니다.
@@ -38,9 +36,9 @@ Failover를 지원하는 여러가지 툴들이 있습니다. 여기서는 여�
 
 **가장 적합한 MHA를 사용하기로 결정!**
 
-## 2. Replication 셋팅하기
+## 2. Replication 설정하기
 
-failover를 하기전에 Master-Slave Replication을 셋팅해야 합니다.
+failover를 하기전에 Master-Slave Replication을 설정해야 합니다.
 
 테스트 환경은 AWS를 이용하였습니다.  
 AWS를 사용한다면 하나의 서버에 mariadb를 설치한 후 AMI로 만들어서 나머지 서버들을 만들면 편리합니다.
@@ -57,7 +55,7 @@ Master  -  Slave_1
 - 각 MariaDB를 remote로 접속하기 때문에 `/etc/mysql/my.cnf`에서 `bind-address = 127.0.0.1`으로 되어있는 부분들을 주석처리해야 합니다.
 - Scurity Group Inbound에서 3306번 포트와 22번 포트를 열어줘야 합니다. 이 [링크](http://pyrasis.com/book/TheArtOfAmazonWebServices/Chapter05)를 참고하세요.
 
-### 1. Master 설정
+### 2.1 Master 설정
 
 `sudo vi /etc/mysql/my.cnf`
 
@@ -108,9 +106,9 @@ MariaDB [(none)]> SHOW MASTER STATUS\G;
 Binlog_Ignore_DB:
 ```
 
-여기서 나온 File과 Position은 아래에 slave 셋팅을 할 때 사용할 값이니 어딘가에 저장해둡니다.
+여기서 나온 File과 Position은 아래에 slave 설정을 할 때 사용할 값이니 어딘가에 저장해둡니다.
 
-### 2. Slave 설정
+### 2.2 Slave 설정
 
 `sudo vi /etc/mysql/my.cnf`
 
@@ -160,7 +158,7 @@ slave\_1이라면 server-id를 2로 지정하고, slave\_2라면 server-id를 3�
 위에서와 같이 파일을 저장하고, mariadb를 재시작해줍니다. `sudo service mysql restart`
 
 
-재시작한 후에 mariadb console에 접속하여 master 셋팅을 추가합니다.
+재시작한 후에 mariadb console에 접속하여 master 설정을 추가합니다.
 
 `mysql -u root -p`
 
@@ -199,7 +197,7 @@ Slave\_IO\_Status가 Waiting for master to send event라면 replication이 잘 �
 
 오류가 발생한다면 위에서 설명한 **AWS상에서 테스트시 설정해야하는 사항**을 참고해보세요.
 
-### 3. GTID 사용하기
+### 2.3 GTID 사용하기
 
 GTID를 적용하기 위해서는 우선 Master DB에서 GTID 사용을 활성화 해야합니다.
 
@@ -292,12 +290,12 @@ MariaDB [(none)]> show slave status\G;
 > [Replication 참고자료](http://www.tutorialbook.co.kr/entry/MariaDB-Mysql-%EC%9D%BC%EB%B0%98-Replication-%EB%B3%B5%EC%A0%9C-%ED%95%98%EA%B8%B0)  
 > [GTID 적용 참고자료](https://mariadb.com/blog/enabling-gtids-server-replication-mariadb-100)
 
-## MHA 설정하기
+## 3. MHA 설정하기
  
-### 1. 설치하기
+### 3.1 설치하기
 
 
-MHA를 셋팅하기 위해서는 Master-Slave DB 이외에 모니터링 서버를 한대 따로 두어야합니다.  
+MHA를 설정하기 위해서는 Master-Slave DB 이외에 모니터링 서버를 한대 따로 두어야합니다.  
 모니터링 서버에 MHA manager와 MHA node를 설치하고, 각 DB들에 MHA node을 설치합니다.  
 manager는 node끼리의 통신을 통해 현재 DB의 상태를 확인할 수 있습니다.
   
@@ -307,7 +305,7 @@ Manager 서버는 DB서버와 같이 mariadb-10.1을 설치해두었습니다.
  
 이 문서에서는`mha4mysql-manager_0.55-0_all.deb`, `mha4mysql-node_0.54-0_all.deb` 버전을 사용하였습니다.
  
-### 2. configuration file 생성하기
+### 3.2 configuration file 생성하기
  
 `/etc/mha/app.cnf` 파일을 생성합니다.(mha 폴더는 임의로 생성한 폴더)
 
@@ -351,7 +349,7 @@ no_master=1
 > 해당 문제를 해결하는 방법은 [여기](https://code.google.com/p/mysql-master-ha/issues/detail?id=70)를 참고해서 version 체크하는 부분을 바꿔주면 됩니다.  
 > 하지만 해당 해결 방법은 공식적인 방법이 아니므로 오류가 발생할 여지는 있습니다.
 
-### 3. ssh key 등록하기
+### 3.3 ssh key 등록하기
 
 문제가 발생했는지 확인하거나, 각 상태를 변경해야하기 때문에 ssh를 이용합니다.
 
@@ -400,7 +398,7 @@ Tue Oct 11 09:23:02 2016 - [debug]   ok.
 Tue Oct 11 09:23:02 2016 - [info] All SSH connection tests passed successfully.
 ```
 
-### 4. replication 테스트 하기
+### 3.4 replication 테스트 하기
 
 ssh 테스트가 성공적으로 끝났다면, replication도  `masterha_check_repl --conf /etc/mha/app.cnf` 명렁어를 이용해 테스트 해볼 수 있습니다.
 
@@ -437,10 +435,10 @@ Tue Oct 11 09:36:18 2016 - [info] Got exit code 0 (Not master dead).
 MySQL Replication Health is OK.
 ```
 
-위와 같은 메세지를 받아본다면 replication 셋팅도 잘 되어있다는 이야기입니다.  
+위와 같은 메세지를 받아본다면 replication 설정도 잘 되어있다는 이야기입니다.  
 해당 메세지를 살펴보면 현재 살아있는 서버들에 대한 정보, 현재 Master에 대한 정보, 현재 Slave들에 대한 정보들을 확인할 수 있습니다.
 
-### 5. failover 테스트 하기
+### 3.5 failover 테스트 하기
 
 ssh, replication 둘 다 테스트를 통과했다면 직접 failover를 테스트해봅니다.
 
