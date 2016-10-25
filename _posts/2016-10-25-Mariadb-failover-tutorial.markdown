@@ -93,6 +93,10 @@ expire_logs_days        = 10
 max_binlog_size         = 100M
 ```
 
+**server-id?**
+
+> server-id는 replication 상태에서 master와 slave를 구분해주는 값입니다. server-id는 유니크한 값이어야합니다.
+
 파일을 저장하고, mariadb를 재시작해줍니다. `sudo service mysql restart`
 
 그리고 마스터의 상태를 확인하기 위해서 아래 명령어를 실행합니다.
