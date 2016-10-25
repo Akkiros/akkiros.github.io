@@ -21,10 +21,10 @@ Failover를 지원하는 여러가지 툴들이 있습니다. 여기서는 여�
 
 ### 2. [ProxySQL](http://www.proxysql.com/)
 
-- Query Routing, Query Caching, Statistics 등 쿼리에 관련된 여러가지 작업들을 해주는 툴이다.
-- Master, Slave 관계에 관해 hostgroup라는 개념으로 나누는데, 특정 쿼리 패턴에 따라 원하는 hostgroup에 속한 서버로 쿼리를 보내는 처리를 해준다.
-- 상태 체크는 별도의 모니터링 모듈을 이용한다.
-- Failover를 지원하는 것 같지만, 아직은 지원하지 않는다.
+- Query Routing, Query Caching, Statistics 등 쿼리에 관련된 여러가지 작업들을 해주는 툴입니다.
+- Master, Slave 관계에 관해 hostgroup라는 개념으로 나누는데, 특정 쿼리 패턴에 따라 원하는 hostgroup에 속한 서버로 쿼리를 보내는 처리를 해줍니다.
+- 상태 체크는 별도의 모니터링 모듈을 이용합니다.
+- Failover를 지원하는 것 같지만, 아직은 지원하지 않습니다.
 - [ProxySQL의 Schema, health check에 관한 설명](http://severalnines.com/blog/mysql-load-balancing-proxysql-overview)을 참고해보세요.
 
 ### 3. [MHA(Master High Availability)](https://code.google.com/p/mysql-master-ha/)
